@@ -1,21 +1,40 @@
 #!/usr/bin/env bash
 
 # Stop execution on any errors and undefined variables
-#set -euo pipefail
+set -euo pipefail
 
-# Directory of the scripts
-SCRIPTS_DIR=$(pwd)
-BUILD_DIR="$(cd "$SCRIPTS_DIR/../build" &> /dev/null && pwd)"
-NETWORK_DIR="$(cd "$SCRIPTS_DIR/../network" &> /dev/null && pwd)"
+# Set the working directory to the current directory
+CURRENT_DIR=$(pwd)
+BUILD_DIR="$CURRENT_DIR/build"
+NETWORK_DIR="$CURRENT_DIR/network"
+
 # Ensure the required directories exist
 mkdir -p "$BUILD_DIR"
 mkdir -p "$NETWORK_DIR"
 
+# Create a basic config.yaml if it doesn't exist
+CONFIG_FILE="$NETWORK_DIR/config.yaml"
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "Creating basic config.yaml..."
+    cat <<EOL > "$CONFIG_FILE"
+network:
+  eth1:
+    enabled: true
+    endpoints:
+      - "http://localhost:8545"
+
+log-level: DEBUG
+EOL
+    echo "config.yaml created at $CONFIG_FILE"
+else
+    echo "config.yaml already exists at $CONFIG_FILE"
+fi
+
 # Check Python version and install if necessary
 if ! command -v python3 &> /dev/null; then
     echo "Python 3 is not installed. Installing..."
-    sudo apt-get update
-    sudo apt-get install -y python3 python3-pip python3-venv
+    brew update
+    brew install python3
 else
     echo "Python 3 is already installed."
 fi
@@ -45,7 +64,7 @@ echo "Python virtual environment activated."
 # Install dependencies for Nimbus if not already installed
 if ! command -v make &> /dev/null; then
     echo "Installing build dependencies..."
-    sudo apt-get install -y build-essential libssl-dev curl git
+    brew install make openssl curl git
 fi
 
 # Clone Nimbus repository if it doesn't exist
@@ -91,7 +110,7 @@ JWT_SECRET_FILE="$BUILD_DIR/jwtsecret"
 create_jwt_token "$JWT_SECRET_FILE"
 
 # Print out environment setup for confirmation
-echo "SCRIPTS_DIR=$SCRIPTS_DIR"
+echo "CURRENT_DIR=$CURRENT_DIR"
 echo "BUILD_DIR=$BUILD_DIR"
 echo "NETWORK_DIR=$NETWORK_DIR"
 echo "DATA_DIR=$(data_dir_for_network)"

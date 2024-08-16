@@ -28,8 +28,8 @@ Nimbus is a Beacon chain client for Ethereum 2.0. Follow these steps to install 
 
 1. **Install Dependencies**:
    ```bash
-   sudo apt-get update
-   sudo apt-get install -y build-essential git libssl-dev curl
+   brew update
+   brew install make openssl curl git
    ```
 
 2. **Clone the Nimbus Repository**:

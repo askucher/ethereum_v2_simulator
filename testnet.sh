@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
-echo "Start"
+
+# Enable debug output
+set -x
+
 # Load environment settings
-source env.sh
+CURRENT_DIR=$(pwd)
+source "$CURRENT_DIR/env.sh"
+
 # Set up data directories
 DATA_DIR=$(create_data_dir_for_network)
 JWT_TOKEN="$DATA_DIR/jwtsecret"
@@ -15,15 +20,23 @@ ANVIL="anvil"
 L1_DEV_PORT=8545
 L1_CHAIN_ID=1337
 
-echo "$ANVIL --fork-url https://eth-sepolia-public.unifra.io --port $L1_DEV_PORT --chain-id $L1_CHAIN_ID --genesis $GENESIS_FILE" > local-node.sh
+# Debugging information
+echo "Starting Anvil..."
+echo "$ANVIL --fork-url http://localhost:8545 --port $L1_DEV_PORT --chain-id $L1_CHAIN_ID --genesis $GENESIS_FILE"
+
+echo "$ANVIL --fork-url http://localhost:8545 --port $L1_DEV_PORT --chain-id $L1_CHAIN_ID --genesis $GENESIS_FILE" > local-node.sh
 
 chmod +x local-node.sh
 pm2 start local-node.sh
 echo "Anvil is running on port $L1_DEV_PORT with chain ID $L1_CHAIN_ID and genesis file $GENESIS_FILE."
 
 # Run the Nimbus Beacon Node
-BEACON_NODE_BINARY="./build/nimbus_beacon_node"
-NETWORK_CONFIG="$DATA_DIR/config.yaml"
+BEACON_NODE_BINARY="$BUILD_DIR/nimbus-eth2/build/nimbus_beacon_node"
+NETWORK_CONFIG="$NETWORK_DIR/config.yaml"
+
+# Debugging information
+echo "Starting Nimbus Beacon Node..."
+echo "$BEACON_NODE_BINARY --config-file=$NETWORK_CONFIG --genesis=$GENESIS_FILE --jwt-secret=$JWT_TOKEN"
 
 "$BEACON_NODE_BINARY" --config-file="$NETWORK_CONFIG" --genesis="$GENESIS_FILE" --jwt-secret="$JWT_TOKEN" &
 echo "Beacon chain node is running with config file $NETWORK_CONFIG and genesis file $GENESIS_FILE."
