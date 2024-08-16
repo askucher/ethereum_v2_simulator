@@ -60,10 +60,18 @@ fi
 source "$VENV_DIR/bin/activate"
 echo "Python virtual environment activated."
 
-# Install dependencies for Nimbus if not already installed
+# Install necessary build tools if not already installed
 if ! command -v make &> /dev/null; then
     echo "Installing build dependencies..."
     brew install make openssl curl git
+fi
+
+# Install CMake if not already installed
+if ! command -v cmake &> /dev/null; then
+    echo "CMake not installed. Installing..."
+    brew install cmake
+else
+    echo "CMake is already installed."
 fi
 
 # Clone Nimbus repository if it doesn't exist
