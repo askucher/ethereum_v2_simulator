@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-
+echo "Start"
 # Load environment settings
-source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
-
+source env.sh
 # Set up data directories
 DATA_DIR=$(create_data_dir_for_network)
 JWT_TOKEN="$DATA_DIR/jwtsecret"

@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
 # Stop execution on any errors and undefined variables
-set -euo pipefail
+#set -euo pipefail
 
 # Directory of the scripts
-SCRIPTS_DIR="$(dirname "${BASH_SOURCE[0]}")"
+SCRIPTS_DIR=$(pwd)
 BUILD_DIR="$(cd "$SCRIPTS_DIR/../build" &> /dev/null && pwd)"
 NETWORK_DIR="$(cd "$SCRIPTS_DIR/../network" &> /dev/null && pwd)"
-
 # Ensure the required directories exist
 mkdir -p "$BUILD_DIR"
 mkdir -p "$NETWORK_DIR"
