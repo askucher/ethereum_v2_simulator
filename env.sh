@@ -12,22 +12,21 @@ NETWORK_DIR="$CURRENT_DIR/network"
 mkdir -p "$BUILD_DIR"
 mkdir -p "$NETWORK_DIR"
 
-# Create a basic config.yaml if it doesn't exist
-CONFIG_FILE="$NETWORK_DIR/config.yaml"
+# Create a basic config.toml if it doesn't exist
+CONFIG_FILE="$NETWORK_DIR/config.toml"
 if [ ! -f "$CONFIG_FILE" ]; then
-    echo "Creating basic config.yaml..."
+    echo "Creating basic config.toml..."
     cat <<EOL > "$CONFIG_FILE"
-network:
-  eth1:
-    enabled: true
-    endpoints:
-      - "http://localhost:8545"
+[network]
+  [network.eth1]
+  enabled = true
+  endpoints = ["http://localhost:8545"]
 
-log-level: DEBUG
+log-level = "DEBUG"
 EOL
-    echo "config.yaml created at $CONFIG_FILE"
+    echo "config.toml created at $CONFIG_FILE"
 else
-    echo "config.yaml already exists at $CONFIG_FILE"
+    echo "config.toml already exists at $CONFIG_FILE"
 fi
 
 # Check Python version and install if necessary

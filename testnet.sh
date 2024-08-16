@@ -32,7 +32,7 @@ echo "Anvil is running on port $L1_DEV_PORT with chain ID $L1_CHAIN_ID and genes
 
 # Run the Nimbus Beacon Node
 BEACON_NODE_BINARY="$BUILD_DIR/nimbus-eth2/build/nimbus_beacon_node"
-NETWORK_CONFIG="$NETWORK_DIR/config.yaml"
+NETWORK_CONFIG="$NETWORK_DIR/config.toml"
 
 # Debugging information
 echo "Starting Nimbus Beacon Node..."

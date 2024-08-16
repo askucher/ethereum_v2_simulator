@@ -44,20 +44,19 @@ Nimbus is a Beacon chain client for Ethereum 2.0. Follow these steps to install 
    make nimbus_beacon_node
    ```
 
-4. **Create a Configuration File** (e.g., `config.yaml`):
-   ```yaml
-   network:
-     eth1:
-       enabled: true
-       endpoints:
-         - "http://localhost:8545"  # Adjust this to your Anvil instance
+4. **Create a Configuration File** (e.g., `config.toml`):
+   ```toml
+   [network]
+     [network.eth1]
+     enabled = true
+     endpoints = ["http://localhost:8545"]
 
-   log-level: DEBUG
+   log-level = "DEBUG"
    ```
 
 5. **Run the Nimbus Beacon Node**:
    ```bash
-   ./build/nimbus_beacon_node --config-file=config.yaml --jwt-secret=path_to_jwt_secret_file
+   ./build/nimbus_beacon_node --config-file=config.toml --jwt-secret=path_to_jwt_secret_file
    ```
 
 ### Other Dependencies
