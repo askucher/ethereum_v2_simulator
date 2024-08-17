@@ -4,3 +4,4 @@
   endpoints = ["http://localhost:8545"]
 
 log-level = "DEBUG"
+
