@@ -1,3 +1,48 @@
+
+# Check if Anvil is installed
+if ! command -v anvil &> /dev/null
+then
+    echo "Anvil not found, installing Foundry (includes Anvil)..."
+    curl -L https://foundry.paradigm.xyz | bash
+    foundryup
+else
+    echo "Anvil is already installed."
+fi
+
+
+#!/usr/bin/env bash
+
+# Install Homebrew if not already installed
+if ! command -v brew &> /dev/null
+then
+    echo "Homebrew not found, installing it..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+# Install Node.js if not already installed
+if ! command -v node &> /dev/null
+then
+    echo "Node.js not found, installing it..."
+    brew install node
+fi
+
+# Install Git if not already installed
+if ! command -v git &> /dev/null
+then
+    echo "Git not found, installing it..."
+    brew install git
+fi
+
+# Install pm2 if not already installed
+if ! command -v pm2 &> /dev/null
+then
+    echo "pm2 not found, installing it..."
+    npm install -g pm2
+fi
+
+echo "All prerequisites installed."
+
+
 #!/usr/bin/env bash
 
 # Stop execution on any errors and undefined variables
