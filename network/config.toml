@@ -1,7 +1,6 @@
 [network]
-  [network.eth1]
-  enabled = true
-  endpoints = ["http://localhost:8545"]
+[network.eth1]
+enabled = true
+endpoints = ["http://localhost:8545"]
 
 log-level = "DEBUG"
-

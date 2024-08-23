@@ -1,48 +1,3 @@
-
-# Check if Anvil is installed
-if ! command -v anvil &> /dev/null
-then
-    echo "Anvil not found, installing Foundry (includes Anvil)..."
-    curl -L https://foundry.paradigm.xyz | bash
-    foundryup
-else
-    echo "Anvil is already installed."
-fi
-
-
-#!/usr/bin/env bash
-
-# Install Homebrew if not already installed
-if ! command -v brew &> /dev/null
-then
-    echo "Homebrew not found, installing it..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
-
-# Install Node.js if not already installed
-if ! command -v node &> /dev/null
-then
-    echo "Node.js not found, installing it..."
-    brew install node
-fi
-
-# Install Git if not already installed
-if ! command -v git &> /dev/null
-then
-    echo "Git not found, installing it..."
-    brew install git
-fi
-
-# Install pm2 if not already installed
-if ! command -v pm2 &> /dev/null
-then
-    echo "pm2 not found, installing it..."
-    npm install -g pm2
-fi
-
-echo "All prerequisites installed."
-
-
 #!/usr/bin/env bash
 
 # Stop execution on any errors and undefined variables
@@ -57,58 +12,34 @@ NETWORK_DIR="$CURRENT_DIR/network"
 mkdir -p "$BUILD_DIR"
 mkdir -p "$NETWORK_DIR"
 
-# Create a basic config.toml if it doesn't exist
-CONFIG_FILE="$NETWORK_DIR/config.toml"
-if [ ! -f "$CONFIG_FILE" ]; then
-    echo "Creating basic config.toml..."
-    cat <<EOL > "$CONFIG_FILE"
-[network]
-  [network.eth1]
-  enabled = true
-  endpoints = ["http://localhost:8545"]
-
-log-level = "DEBUG"
-EOL
-    echo "config.toml created at $CONFIG_FILE"
-else
-    echo "config.toml already exists at $CONFIG_FILE"
+# Install Homebrew if not already installed
+if ! command -v brew &> /dev/null; then
+    echo "Homebrew not found, installing it..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-# Check Python version and install if necessary
+# Install Node.js if not already installed
+if ! command -v node &> /dev/null; then
+    echo "Node.js not found, installing it..."
+    brew install node
+fi
+
+# Install Git if not already installed
+if ! command -v git &> /dev/null; then
+    echo "Git not found, installing it..."
+    brew install git
+fi
+
+# Install pm2 if not already installed
+if ! command -v pm2 &> /dev/null; then
+    echo "pm2 not found, installing it..."
+    npm install -g pm2
+fi
+
+# Install Python 3 if not already installed
 if ! command -v python3 &> /dev/null; then
     echo "Python 3 is not installed. Installing..."
-    brew update
-    brew install python3
-else
-    echo "Python 3 is already installed."
-fi
-
-# Verify Python version
-PYTHON_VERSION=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
-REQUIRED_PYTHON="3.6"
-
-if [ "$(printf '%s\n' "$REQUIRED_PYTHON" "$PYTHON_VERSION" | sort -V | head -n1)" = "$REQUIRED_PYTHON" ]; then 
-    echo "Python version $PYTHON_VERSION is installed."
-else
-    echo "Python version is lower than required. Please update Python to at least $REQUIRED_PYTHON."
-    exit 1
-fi
-
-# Set up a Python virtual environment
-VENV_DIR="$BUILD_DIR/venv"
-if [ ! -d "$VENV_DIR" ]; then
-    echo "Creating Python virtual environment..."
-    python3 -m venv "$VENV_DIR"
-fi
-
-# Activate the virtual environment
-source "$VENV_DIR/bin/activate"
-echo "Python virtual environment activated."
-
-# Install necessary build tools if not already installed
-if ! command -v make &> /dev/null; then
-    echo "Installing build dependencies..."
-    brew install make openssl curl git
+    brew install python
 fi
 
 # Install CMake if not already installed
@@ -119,17 +50,26 @@ else
     echo "CMake is already installed."
 fi
 
-# Clone Nimbus repository if it doesn't exist
+# Check if Nimbus Beacon Node binary already exists
 NIMBUS_DIR="$BUILD_DIR/nimbus-eth2"
-if [ ! -d "$NIMBUS_DIR" ]; then
-    echo "Cloning Nimbus repository..."
-    git clone https://github.com/status-im/nimbus-eth2 "$NIMBUS_DIR"
-fi
+BEACON_NODE_BINARY="$NIMBUS_DIR/build/nimbus_beacon_node"
 
-# Build Nimbus
-cd "$NIMBUS_DIR"
-make update
-make nimbus_beacon_node
+if [ ! -f "$BEACON_NODE_BINARY" ]; then
+    echo "Nimbus Beacon Node binary not found, building Nimbus..."
+    
+    # Clone Nimbus repository if it doesn't exist
+    if [ ! -d "$NIMBUS_DIR" ]; then
+        echo "Cloning Nimbus repository..."
+        git clone https://github.com/status-im/nimbus-eth2 "$NIMBUS_DIR"
+    fi
+    
+    # Build Nimbus
+    cd "$NIMBUS_DIR"
+    make update
+    make nimbus_beacon_node
+else
+    echo "Nimbus Beacon Node binary found, skipping build."
+fi
 
 # Function to manage data directories for the network
 data_dir_for_network() {
@@ -167,5 +107,5 @@ echo "BUILD_DIR=$BUILD_DIR"
 echo "NETWORK_DIR=$NETWORK_DIR"
 echo "DATA_DIR=$(data_dir_for_network)"
 echo "JWT_SECRET_FILE=$JWT_SECRET_FILE"
-echo "Python version: $PYTHON_VERSION"
 echo "Nimbus directory: $NIMBUS_DIR"
+echo "Beacon Node Binary: $BEACON_NODE_BINARY"

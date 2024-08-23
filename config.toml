@@ -1,7 +1,0 @@
-  network:
-  eth1:
-    enabled: true
-    endpoints:
-      - "http://localhost:8545"  # Adjust this to your Anvil instance
-
-  log-level: DEBUG
