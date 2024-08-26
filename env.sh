@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 
 # Stop execution on any errors and undefined variables
@@ -51,61 +52,85 @@ else
 fi
 
 # Check if Nimbus Beacon Node binary already exists
-NIMBUS_DIR="$BUILD_DIR/nimbus-eth2"
-BEACON_NODE_BINARY="$NIMBUS_DIR/build/nimbus_beacon_node"
+# NIMBUS_DIR="$BUILD_DIR/nimbus-eth2"
+# BEACON_NODE_BINARY="$NIMBUS_DIR/build/nimbus_beacon_node"
 
-if [ ! -f "$BEACON_NODE_BINARY" ]; then
-    echo "Nimbus Beacon Node binary not found, building Nimbus..."
+# if [ ! -f "$BEACON_NODE_BINARY" ]; then
+#     echo "Nimbus Beacon Node binary not found, building Nimbus..."
     
-    # Clone Nimbus repository if it doesn't exist
-    if [ ! -d "$NIMBUS_DIR" ]; then
-        echo "Cloning Nimbus repository..."
-        git clone https://github.com/status-im/nimbus-eth2 "$NIMBUS_DIR"
-    fi
+#     # Clone Nimbus repository if it doesn't exist
+#     if [ ! -d "$NIMBUS_DIR" ]; then
+#         echo "Cloning Nimbus repository..."
+#         git clone https://github.com/status-im/nimbus-eth2 "$NIMBUS_DIR"
+#     fi
     
-    # Build Nimbus
-    cd "$NIMBUS_DIR"
-    make update
-    make nimbus_beacon_node
-else
-    echo "Nimbus Beacon Node binary found, skipping build."
-fi
+#     # Build Nimbus
+#     cd "$NIMBUS_DIR"
+#     make update
+#     make nimbus_beacon_node
+# else
+#     echo "Nimbus Beacon Node binary found, skipping build."
+# fi
 
 # Function to manage data directories for the network
-data_dir_for_network() {
-  NETWORK_ID=$(cat "$NETWORK_DIR/genesis.json" | jq '.config.chainId')
-  echo "$BUILD_DIR/data/$NETWORK_ID"
-}
+# data_dir_for_network() {
+#   NETWORK_ID=$(cat "$NETWORK_DIR/genesis.json" | jq '.config.chainId')
+#   echo "$BUILD_DIR/data/$NETWORK_ID"
+# }
 
-create_data_dir_for_network() {
-  NETWORK_PATH=$(data_dir_for_network)
-  mkdir -p "$NETWORK_PATH"
-  echo "$NETWORK_PATH"
-}
+# create_data_dir_for_network() {
+#   NETWORK_PATH=$(data_dir_for_network)
+#   mkdir -p "$NETWORK_PATH"
+#   echo "$NETWORK_PATH"
+# }
 
 # Create the data directory if it doesn't exist
-create_data_dir_for_network
+# create_data_dir_for_network
 
 # Function to create a JWT token if it doesn't exist
-create_jwt_token() {
-  JWT_FILE="$1"
-  if [ ! -f "$JWT_FILE" ]; then
-    openssl rand -hex 32 | tr -d "\n" > "$JWT_FILE"
-    echo "JWT token created at $JWT_FILE"
-  else
-    echo "JWT token already exists at $JWT_FILE"
-  fi
-}
+# create_jwt_token() {
+#   JWT_FILE="$1"
+#   if [ ! -f "$JWT_FILE" ]; then
+#     openssl rand -hex 32 | tr -d "\n" > "$JWT_FILE"
+#     echo "JWT token created at $JWT_FILE"
+#   else
+#     echo "JWT token already exists at $JWT_FILE"
+#   fi
+# }
 
-# Set up the JWT secret file
-JWT_SECRET_FILE="$BUILD_DIR/jwtsecret"
-create_jwt_token "$JWT_SECRET_FILE"
+# # Set up the JWT secret file
+# JWT_SECRET_FILE="$BUILD_DIR/jwtsecret"
+# create_jwt_token "$JWT_SECRET_FILE"
 
-# Print out environment setup for confirmation
-echo "CURRENT_DIR=$CURRENT_DIR"
-echo "BUILD_DIR=$BUILD_DIR"
-echo "NETWORK_DIR=$NETWORK_DIR"
-echo "DATA_DIR=$(data_dir_for_network)"
-echo "JWT_SECRET_FILE=$JWT_SECRET_FILE"
-echo "Nimbus directory: $NIMBUS_DIR"
-echo "Beacon Node Binary: $BEACON_NODE_BINARY"
+# # Print out environment setup for confirmation
+# echo "CURRENT_DIR=$CURRENT_DIR"
+# echo "BUILD_DIR=$BUILD_DIR"
+# echo "NETWORK_DIR=$NETWORK_DIR"
+# echo "DATA_DIR=$(data_dir_for_network)"
+# echo "JWT_SECRET_FILE=$JWT_SECRET_FILE"
+# echo "Nimbus directory: $NIMBUS_DIR"
+# echo "Beacon Node Binary: $BEACON_NODE_BINARY"
+
+# Install Foundry if it's not already installed
+if ! command -v foundryup &> /dev/null; then
+    echo "Foundry is not installed. Installing Foundry..."
+    curl -L https://foundry.paradigm.xyz | bash
+    source ~/.bashrc
+    foundryup
+else
+    echo "Foundry is already installed."
+fi
+
+# Ensure Foundry is up to date
+foundryup
+
+# Add Foundry to the PATH
+export PATH=$PATH:$HOME/.foundry/bin
+
+# Anvil-related settings
+export ANVIL_CHAIN_ID=1337
+export ANVIL_PORT=8545
+export ANVIL_GENESIS_FILE="$CURRENT_DIR/network/genesis.json"
+export ANVIL_BLOCK_TIME=10
+
+# Other environment variables can go here as well
